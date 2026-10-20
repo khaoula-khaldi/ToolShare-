@@ -3,6 +3,9 @@ require("dotenv").config();
 const express = require("express");
 const connecterDB = require("./config/database");
 
+const materielRoutes = require("./routes/materielRoutes");
+
+
 const app = express();
 
 app.use(express.json());
@@ -12,6 +15,9 @@ app.get("/", (req, res) => {
         message: "Bienvenue dans l'API ToolShare"
     });
 });
+
+app.use("/api/materiels", materielRoutes);
+
 
 const demarrerServeur = async () => {
     try {
