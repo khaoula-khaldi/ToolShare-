@@ -1,6 +1,7 @@
 require("dotenv").config();
-
+const installationRoutes = require('./routes/installation.routes')
 const express = require("express");
+const errorHandler = require('./middlewares/ErrorHandler')
 const connecterDB = require("./config/database");
 
 const app = express();
@@ -12,6 +13,9 @@ app.get("/", (req, res) => {
         message: "Bienvenue dans l'API ToolShare"
     });
 });
+
+app.use('/api/installation' , installationRoutes )
+
 
 const demarrerServeur = async () => {
     try {
@@ -28,4 +32,6 @@ const demarrerServeur = async () => {
     }
 };
 
+
+app.use(errorHandler);
 demarrerServeur();
