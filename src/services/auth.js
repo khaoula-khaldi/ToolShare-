@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { findByEmailWithPassword } = require('../repositories/user.repo');
-
+const {checkPassword} = require('./handlePassword')
 const AppError = require('../utils/AppError');
 
 const INVALID_CREDENTIALS = 'Email ou mot de passe incorrect';
@@ -11,7 +11,7 @@ const loginUser = async ({ email, password }) => {
     throw new AppError(INVALID_CREDENTIALS, 401);
   }
 
-  const isMatch = await (password, user.password);
+  const isMatch = await checkPassword(password, user.password);
   if (!isMatch) {
     throw new AppError(INVALID_CREDENTIALS, 401);
   }
@@ -26,8 +26,7 @@ const loginUser = async ({ email, password }) => {
     token,
     user: {
       id: user.id,
-      first_name: user.first_name,
-      last_name: user.last_name,
+      name: user.name,
       email: user.email,
       role: user.role,
     },
