@@ -1,14 +1,18 @@
 require("dotenv").config();
-const installationRoutes = require('./routes/installation.routes')
 const express = require("express");
 const errorHandler = require('./middlewares/ErrorHandler')
 const connecterDB = require("./config/database");
 
+const installationRoutes = require('./routes/installation.routes')
 const materielRoutes = require("./routes/materielRoutes");
 const magasinRoutes = require("./routes/magasinRoutes");
-
-
+const authRoutes = require("./routes/auth.routes");
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 const app = express();
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 app.use(express.json());
 
@@ -21,6 +25,7 @@ app.get("/", (req, res) => {
 app.use('/api/installation' , installationRoutes )
 app.use("/api/materiels", materielRoutes);
 app.use("/api/magasins", magasinRoutes);
+app.use("/api/auth", authRoutes);
 
 
 const demarrerServeur = async () => {
