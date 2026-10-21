@@ -1,8 +1,11 @@
-
 require("dotenv").config();
 
 const express = require("express");
 const connecterDB = require("./config/database");
+
+const materielRoutes = require("./routes/materielRoutes");
+const magasinRoutes = require("./routes/magasinRoutes");
+
 
 const app = express();
 
@@ -13,6 +16,10 @@ app.get("/", (req, res) => {
         message: "Bienvenue dans l'API ToolShare"
     });
 });
+
+app.use("/api/materiels", materielRoutes);
+app.use("/api/magasins", magasinRoutes);
+
 
 const demarrerServeur = async () => {
     try {
