@@ -5,5 +5,7 @@ async function create(data) {
 
 }
 
-
-module.exports = {create }
+async function findUserById(id) {
+  return await User.findById(id);
+}
+module.exports = {create,findUserById}
