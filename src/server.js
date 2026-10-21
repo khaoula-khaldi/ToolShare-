@@ -1,11 +1,12 @@
 require("dotenv").config();
-const installationRoutes = require('./routes/installation.routes')
 const express = require("express");
 const errorHandler = require('./middlewares/ErrorHandler')
 const connecterDB = require("./config/database");
 
+const installationRoutes = require('./routes/installation.routes')
 const materielRoutes = require("./routes/materielRoutes");
 const magasinRoutes = require("./routes/magasinRoutes");
+const authRoutes = require("./routes/auth.routes");
 
 
 const app = express();
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 app.use('/api/installation' , installationRoutes )
 app.use("/api/materiels", materielRoutes);
 app.use("/api/magasins", magasinRoutes);
+app.use("/api/auth", authRoutes);
 
 
 const demarrerServeur = async () => {
