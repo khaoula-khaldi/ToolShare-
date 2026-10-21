@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const authorize = require("../middlewares/authorize")
 
 const materielController = require("../controllers/materielController");
 
-router.post("/", materielController.creer);
+router.post("/",authorize("admin    ","administrator") ,materielController.creer);
 
 router.get("/", materielController.obtenirTous);
 
