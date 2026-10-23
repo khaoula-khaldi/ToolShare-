@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {me} = require('../controllers/userController');
+const {me,createGestionnaire} = require('../controllers/userController');
 const  authenticate = require('../middlewares/authenticate')
-const asyncHandler = require('../utils/AsyncHandler')
-
+const asyncHandler = require('../utils/AsyncHandler');
+const { createGestionnaireSchema } = require('../validations/user.zod');
+const  {validateBody} = require('../middlewares/validate')
 /**
  * @openapi
  * /api/auth/me:
@@ -20,6 +21,6 @@ const asyncHandler = require('../utils/AsyncHandler')
  */
 router.get('/me', authenticate , asyncHandler(me));
 
-
+router.post('/create' , authenticate , validateBody(createGestionnaireSchema) , asyncHandler(createGestionnaire))
 
 module.exports = router;

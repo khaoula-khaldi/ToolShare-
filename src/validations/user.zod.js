@@ -1,6 +1,6 @@
 const { z } = require('zod');
 
-const roles = ['admin', 'manager', 'user'];
+const roles = ['admin', 'gestionnaire', 'user'];
 
 const createUserSchema = z.object({
   name: z.string().trim().min(2).max(100),
@@ -12,6 +12,13 @@ const createUserSchema = z.object({
   message: 'Manager must be assigned to a store',
   path: ['store'],
 });
+
+const createGestionnaireSchema = z.object({
+  name: z.string().trim().min(2).max(100),
+  email: z.string().trim().toLowerCase().email(),
+  password: z.string().min(8).max(100),
+});
+
 
 const loginSchema = z.object({
   email: z
@@ -27,5 +34,6 @@ const loginSchema = z.object({
 
 module.exports = {
   createUserSchema,
-  loginSchema
+  loginSchema,
+  createGestionnaireSchema
 };
