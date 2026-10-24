@@ -19,11 +19,9 @@ const modifierParId = async (id, data) => {
         runValidators: true
     });
 };
-
 const supprimerParId = async (id) => {
     return await Magasin.findByIdAndDelete(id);
 };
-
 module.exports = {
     creer,
     trouverTous,
