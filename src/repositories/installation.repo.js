@@ -9,8 +9,6 @@ const getOrCreate = async (session) =>
   );
 
 
-
-
 const markInstalled = async (session) =>
   await Installation.findOneAndUpdate(
     { key: 'singleton', installed: false },
