@@ -1,17 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const authorize = require("../middlewares/authorize")
+const authMiddleware = require("../middlewares/authenticate");
+const authorize = require("../middlewares/gestionnaireAuthorization");
 
 const materielController = require("../controllers/materielController");
 
-router.post("/",authorize("admin    ","administrator") ,materielController.creer);
+router.post("/",authMiddleware,authorize ,materielController.creer);
 
-router.get("/", materielController.obtenirTous);
+router.get("/",authMiddleware,authorize, materielController.obtenirTous);
 
-router.get("/:id", materielController.obtenirParId);
+router.get("/:id",authMiddleware,authorize, materielController.obtenirParId);
 
-router.patch("/:id", materielController.modifier);
+router.patch("/:id",authMiddleware,authorize, materielController.modifier);
 
-router.patch("/:id/desactiver", materielController.desactiver);
+router.patch("/:id/desactiver",authMiddleware, authorize,materielController.desactiver);
 
 module.exports = router;
