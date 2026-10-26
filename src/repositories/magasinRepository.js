@@ -15,7 +15,7 @@ const trouverParId = async (id) => {
 
 const modifierParId = async (id, data) => {
     return await Magasin.findByIdAndUpdate(id, data, {
-        new: true,
+        returnDocument: 'after',
         runValidators: true
     });
 };
@@ -24,10 +24,20 @@ const supprimerParId = async (id) => {
     return await Magasin.findByIdAndDelete(id);
 };
 
+
+const disactiveMagasin = async (id) => {
+  return await Magasin.findByIdAndUpdate(
+    id,
+    { actif: false },
+    { returnDocument: "after", runValidators: true }
+  );
+};
+
 module.exports = {
     creer,
     trouverTous,
     trouverParId,
     modifierParId,
-    supprimerParId
+    supprimerParId,
+    disactiveMagasin,
 };
