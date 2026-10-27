@@ -71,10 +71,26 @@ const supprimer = async (req, res) => {
     }
 };
 
+const disactive = async (req,res) => {
+    try {
+        const magasin = await magasinService.disactiveMagasinbyId(req.params.id);
+
+        return res.status(200).json({
+            message: "Magasin updated avec succès.",
+            data: magasin
+        });
+    } catch (error) {
+        const status = error.message === "Magasin introuvable." ? 404 : 500;
+
+        return res.status(status).json({ message: error.message });
+    }
+}
+
 module.exports = {
     creer,
     obtenirTous,
     obtenirParId,
     modifier,
-    supprimer
+    supprimer,
+    disactive
 };

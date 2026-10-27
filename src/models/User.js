@@ -6,6 +6,11 @@ const userSchema = new mongoose.Schema(
         email: {type: String,trim: true,lowercase: true,required: true,unique: true},
         password: {type: String ,  required: true,select: false,},
         role: {type: String,enum: ['admin' , 'user','gestionnaire'],default: 'user',},
+        magasinId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Magasin",
+            default: null
+        },
         status : {type : Boolean , default : true}
     },{ timestamps: true,toJSON: {
             transform: (doc, ret) => {

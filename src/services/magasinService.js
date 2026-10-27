@@ -47,10 +47,15 @@ const supprimerMagasin = async (id) => {
     return magasin;
 };
 
+const disactiveMagasinbyId = async (id) => {
+    return await magasinRepository.disactiveMagasin(id)
+}
+
 module.exports = {
     creerMagasin,
     obtenirTousLesMagasins,
     obtenirMagasinParId,
     modifierMagasin,
-    supprimerMagasin
+    supprimerMagasin,
+    disactiveMagasinbyId
 };
