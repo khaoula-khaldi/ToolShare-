@@ -33,9 +33,7 @@ async function handleCreateGestionnaire(role , data) {
 
 const affecterMagasin = async (gestionnaireId, magasinId) => {
     if (!mongoose.isValidObjectId(gestionnaireId) ||!mongoose.isValidObjectId(magasinId)) {
-        const error = new Error("Identifiant invalide");
-        error.statusCode = 400;
-        throw error;
+        throw new AppError("Identifiant invalide",400)
     }
 
     const gestionnaire =await userRepository.findGestionnaireById(gestionnaireId);
@@ -74,5 +72,21 @@ const affecterMagasin = async (gestionnaireId, magasinId) => {
     );
 };
 
+const getMagasinAffecte= async(gestionnaireId)=>{
+    const gestionnaire = await userRepository.findGestionnaireById(gestionnaireId);
 
-module.exports = {handleCreateGestionnaire,affecterMagasin}
+    if(!gestionnaire){
+        throw new AppError("gestionnaire introvable",404);
+    }
+    if(!gestionnaire.magasinId){
+        throw new AppError("Aucun magasin affecté")
+    }
+    const magasin = await magasinRepository.trouverParId(gestionnaire.magasinId);
+    if(!magasin){
+        throw new AppError("magasin introvable",404);
+    }
+    return magasin
+}
+
+
+module.exports = {handleCreateGestionnaire,affecterMagasin,getMagasinAffecte}
