@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+const {magasinSchema} = require("../validations/magasin.zod")
 const magasinController = require("../controllers/magasinController");
 const authMiddleware = require("../middlewares/authenticate");
 const authorize = require("../middlewares/gestionnaireAuthorization");
