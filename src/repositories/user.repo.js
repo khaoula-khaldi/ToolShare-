@@ -14,5 +14,27 @@ async function findUserById(id) {
   return await User.findById(id);
 }
 
+const findGestionnaireById = async (id) => {
+    return User.findOne({
+        _id: id,
+        role: "gestionnaire"
+    });
+};
 
-module.exports = {create,findUserById,findByEmail,findByEmailWithPassword}
+const findGestionnaireByMagasinId = async (magasinId) => {
+    return User.findOne({
+        magasinId,
+        role: "gestionnaire"
+    });
+};
+
+const affecterMagasin = async (gestionnaireId, magasinId) => {
+    return User.findByIdAndUpdate(
+        gestionnaireId,
+        { magasinId },
+        { new: true, runValidators: true }
+    );
+};
+
+
+module.exports = {create,findUserById,findByEmail,findByEmailWithPassword,findGestionnaireById,findGestionnaireByMagasinId,affecterMagasin}
