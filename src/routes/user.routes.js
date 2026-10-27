@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {me,createGestionnaire,affecterMagasin} = require('../controllers/userController');
+const {me,createGestionnaire,affecterMagasin,getMonMagasin } = require('../controllers/userController');
 const  authenticate = require('../middlewares/authenticate')
 const asyncHandler = require('../utils/AsyncHandler');
 const { createGestionnaireSchema } = require('../validations/user.zod');
@@ -66,4 +66,30 @@ router.post('/create' , authenticate , validateBody(createGestionnaireSchema) , 
  *         description: Magasin déjà affecté
  */
 router.patch('/gestionnaires/:id/magasin',authenticate,authorize('admin'),asyncHandler(affecterMagasin));
+
+/**
+ * @openapi
+ * /api/users/mon-magasin:
+ *   get:
+ *     tags:
+ *       - Gestionnaire
+ *     summary: Consulter les informations de son magasin affecté
+ *     description: Permet au gestionnaire connecté de consulter les informations du magasin qui lui est affecté. Le gestionnaire ne peut consulter que son propre magasin.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Informations du magasin récupérées avec succès
+ *       401:
+ *         description: Authentification requise ou token invalide
+ *       403:
+ *         description: Accès interdit. Seul un gestionnaire peut accéder à cette ressource
+ *       404:
+ *         description: Aucun magasin affecté au gestionnaire ou magasin introuvable
+ *       500:
+ *         description: Erreur interne du serveur
+ */
+router.get('/mon-magasin',authenticate,authorize('gestionnaire'),asyncHandler(getMonMagasin));
+
+
 module.exports = router;

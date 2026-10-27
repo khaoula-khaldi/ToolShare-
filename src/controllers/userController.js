@@ -22,7 +22,7 @@ const affecterMagasin = async (req, res, next) => {
             magasinId
         );
 
-        res.status(200).json({
+        return  res.status(200).json({
             message: "Magasin affecté avec succès",
             data: resultat
         });
@@ -30,4 +30,12 @@ const affecterMagasin = async (req, res, next) => {
         next(error);
     }
 };
-module.exports = {me,createGestionnaire,affecterMagasin}
+
+const getMonMagasin = async (req,res)=>{
+  const magasin = await userService.getMagasinAffecte(req.user.id);
+  return res.status(200).json({
+    success:true,
+    data:magasin
+  });
+}
+module.exports = {me,createGestionnaire,affecterMagasin,getMonMagasin}
