@@ -12,7 +12,15 @@ const magasinSchema = new mongoose.Schema(
             required: true,
             trim: true
         },
-        actif : {type : Boolean , default : true}
+        actif : {
+            type : Boolean , 
+            default : true
+        },
+        gestionnaireId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
+        }
     },
     {
         timestamps: true , toJSON: {

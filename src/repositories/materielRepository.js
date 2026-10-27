@@ -15,7 +15,7 @@ const trouverParId = async (id) => {
 
 const modifierParId = async (id, data) => {
     return await Materiel.findByIdAndUpdate(id, data, {
-        new: true,
+        returnDocument: 'after',
         runValidators: true
     });
 };
