@@ -1,33 +1,38 @@
-const { handleCreateGestionnaire } = require('../services/user');
-const AppError = require('../utils/AppError')
-const userService = require("../services/user");
+const userService = require('../services/user');
+const asyncHandler = require('../utils/AsyncHandler');
 
+const create = asyncHandler(async (req, res) => {
+    const user = await userService.createUser(req.user, req.body || {});
+    res.status(201).json({ success: true, data: user });
+});
 
-async function me(req, res) {
-  res.status(200).json({ success: true, data: req.user });
-}
+const list = asyncHandler(async (req, res) => {
+    const result = await userService.getUsers(req.user, req.query);
+    res.status(200).json({ success: true, ...result });
+});
 
-async function createGestionnaire(req,res) {
-  const gestionnaire = await handleCreateGestionnaire(req.user.role,req.body)
-  return res.status(201).json({success : true , data : gestionnaire});
-}
+const getOne = asyncHandler(async (req, res) => {
+    const user = await userService.getUserById(req.user, req.params.id);
+    res.status(200).json({ success: true, data: user });
+});
 
-const affecterMagasin = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const { magasinId } = req.body;
+const update = asyncHandler(async (req, res) => {
+    const user = await userService.updateUser(req.user, req.params.id, req.body || {});
+    res.status(200).json({ success: true, data: user });
+});
 
-        const resultat = await userService.affecterMagasin(
-            id,
-            magasinId
-        );
+const setStatus = asyncHandler(async (req, res) => {
+    const user = await userService.setUserStatus(req.user, req.params.id, req.body?.status);
+    res.status(200).json({ success: true, data: user });
+});
 
-        res.status(200).json({
-            message: "Magasin affecté avec succès",
-            data: resultat
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-module.exports = {me,createGestionnaire,affecterMagasin}
+const affecterMagasin = asyncHandler(async (req, res) => {
+    const user = await userService.affecterMagasin(req.user, req.params.id, req.body?.magasinId);
+    res.status(200).json({ success: true, message: 'Magasin affecté avec succès.', data: user });
+});
+
+const getMonMagasin = asyncHandler(async (req, res) => {
+    const magasin = await userService.getMonMagasin(req.user);
+    res.status(200).json({ success: true, data: magasin });
+});
+module.exports = { create, list, getOne, update, setStatus,affecterMagasin,getMonMagasin };

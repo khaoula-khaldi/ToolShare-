@@ -1,40 +1,25 @@
 const User = require('../models/User');
 
-async function create(data) {
-  return  await User.create(data);
-}
 
-async function findByEmailWithPassword(email) {
-  return  await User.findOne({email}).select('+password');
-}
-async function findByEmail(email) {
-    return User.findOne({ email });
-}
-async function findUserById(id) {
-  return await User.findById(id);
-}
+const create = (data) => User.create(data);
 
-const findGestionnaireById = async (id) => {
-    return User.findOne({
-        _id: id,
-        role: "gestionnaire"
-    });
+const findById = (id) => User.findById(id);
+
+const findByEmail = (email, withPassword = false) => {
+    const query = User.findOne({ email });
+    return withPassword ? query.select('+password') : query;
 };
 
-const findGestionnaireByMagasinId = async (magasinId) => {
-    return User.findOne({
-        magasinId,
-        role: "gestionnaire"
-    });
-};
+const findAll = (filter = {}, { skip = 0, limit = 20 } = {}) =>
+    User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
-const affecterMagasin = async (gestionnaireId, magasinId) => {
-    return User.findByIdAndUpdate(
-        gestionnaireId,
-        { magasinId },
-        { new: true, runValidators: true }
-    );
-};
+const count = (filter = {}) => User.countDocuments(filter);
+
+const updateById = (id, data) => User.findByIdAndUpdate(id, data, { new: true, runValidators: true });
 
 
-module.exports = {create,findUserById,findByEmail,findByEmailWithPassword,findGestionnaireById,findGestionnaireByMagasinId,affecterMagasin}
+const deleteById = (id) => User.findByIdAndDelete(id);
+
+
+
+module.exports = { create, findById, findByEmail, findAll, count, updateById, deleteById };

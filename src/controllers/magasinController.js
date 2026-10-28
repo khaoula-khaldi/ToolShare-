@@ -1,90 +1,57 @@
-
 const magasinService = require("../services/magasinService");
+const asyncHandler = require("../utils/AsyncHandler");
 
-const creer = async (req, res) => {
-    try {
-        const magasin = await magasinService.creerMagasin(req.body);
+const creer = asyncHandler(async (req, res) => {
+    const magasin = await magasinService.creerMagasin(req.body || {});
 
-        return res.status(201).json({
-            message: "Magasin créé avec succès.",
-            data: magasin
-        });
-    } catch (error) {
-        return res.status(400).json({
-            message: error.message
-        });
-    }
-};
+    return res.status(201).json({
+        success: true,
+        message: "Magasin créé avec succès.",
+        data: magasin
+    });
+});
 
-const obtenirTous = async (req, res) => {
-    try {
-        const magasins = await magasinService.obtenirTousLesMagasins();
+const obtenirTous = asyncHandler(async (req, res) => {
+    const magasins = await magasinService.obtenirTousLesMagasins();
 
-        return res.status(200).json({ data: magasins });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-};
+    return res.status(200).json({ success: true, data: magasins });
+});
 
-const obtenirParId = async (req, res) => {
-    try {
-        const magasin = await magasinService.obtenirMagasinParId(req.params.id);
+const obtenirParId = asyncHandler(async (req, res) => {
+    const magasin = await magasinService.obtenirMagasinParId(req.params.id);
 
-        return res.status(200).json({ data: magasin });
-    } catch (error) {
-        const status = error.message === "Magasin introuvable." ? 404 : 500;
+    return res.status(200).json({ success: true, data: magasin });
+});
 
-        return res.status(status).json({ message: error.message });
-    }
-};
+const modifier = asyncHandler(async (req, res) => {
+    const magasin = await magasinService.modifierMagasin(req.params.id, req.body || {});
 
-const modifier = async (req, res) => {
-    try {
-        const magasin = await magasinService.modifierMagasin(
-            req.params.id,
-            req.body
-        );
+    return res.status(200).json({
+        success: true,
+        message: "Magasin modifié avec succès.",
+        data: magasin
+    });
+});
 
-        return res.status(200).json({
-            message: "Magasin modifié avec succès.",
-            data: magasin
-        });
-    } catch (error) {
-        const status = error.message === "Magasin introuvable." ? 404 : 400;
+const supprimer = asyncHandler(async (req, res) => {
+    const magasin = await magasinService.supprimerMagasin(req.params.id);
 
-        return res.status(status).json({ message: error.message });
-    }
-};
+    return res.status(200).json({
+        success: true,
+        message: "Magasin supprimé avec succès.",
+        data: magasin
+    });
+});
 
-const supprimer = async (req, res) => {
-    try {
-        const magasin = await magasinService.supprimerMagasin(req.params.id);
+const disactive = asyncHandler(async (req, res) => {
+    const magasin = await magasinService.disactiveMagasinbyId(req.params.id);
 
-        return res.status(200).json({
-            message: "Magasin supprimé avec succès.",
-            data: magasin
-        });
-    } catch (error) {
-        const status = error.message === "Magasin introuvable." ? 404 : 500;
-
-        return res.status(status).json({ message: error.message });
-    }
-};
-
-const disactive = async (req,res) => {
-    try {
-        const magasin = await magasinService.disactiveMagasinbyId(req.params.id);
-
-        return res.status(200).json({
-            message: "Magasin updated avec succès.",
-            data: magasin
-        });
-    } catch (error) {
-        const status = error.message === "Magasin introuvable." ? 404 : 500;
-
-        return res.status(status).json({ message: error.message });
-    }
-}
+    return res.status(200).json({
+        success: true,
+        message: "Magasin désactivé avec succès.",
+        data: magasin
+    });
+});
 
 module.exports = {
     creer,
