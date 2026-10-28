@@ -1,10 +1,9 @@
 const User = require('../models/User');
 
-const MAGASIN_FIELDS = 'name status';
 
 const create = (data) => User.create(data);
 
-const findById = (id) => User.findById(id).populate('magasin', MAGASIN_FIELDS);
+const findById = (id) => User.findById(id);
 
 const findByEmail = (email, withPassword = false) => {
     const query = User.findOne({ email });
@@ -12,15 +11,15 @@ const findByEmail = (email, withPassword = false) => {
 };
 
 const findAll = (filter = {}, { skip = 0, limit = 20 } = {}) =>
-    User.find(filter)
-        .populate('magasin', MAGASIN_FIELDS)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
+    User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
 const count = (filter = {}) => User.countDocuments(filter);
 
-const updateById = (id, data) =>
-    User.findByIdAndUpdate(id, data, { new: true, runValidators: true }).populate('magasin', MAGASIN_FIELDS);
+const updateById = (id, data) => User.findByIdAndUpdate(id, data, { new: true, runValidators: true });
 
-module.exports = { create, findById, findByEmail, findAll, count, updateById };
+
+const deleteById = (id) => User.findByIdAndDelete(id);
+
+
+
+module.exports = { create, findById, findByEmail, findAll, count, updateById, deleteById };
