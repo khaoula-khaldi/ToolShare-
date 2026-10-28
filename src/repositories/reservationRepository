@@ -1,0 +1,19 @@
+const Reservation = require("../models/Reservation");
+
+
+const trouverChevauchements = async (materielId, debut, fin, maintenant = new Date()) => {
+    return await Reservation.find({
+        materielId,
+        dateDebut: { $lt: fin },
+        $or: [
+            { statut: "CONFIRMEE", dateFin: { $gt: debut } },
+            { statut: "EN_COURS", $or: [{ dateFin: { $gt: debut } }, { dateFin: { $lte: maintenant } }] }
+        ]
+    })
+        .select("dateDebut dateFin statut")
+        .sort({ dateDebut: 1 });
+};
+
+module.exports = {
+    trouverChevauchements
+};
