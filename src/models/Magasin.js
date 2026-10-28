@@ -13,13 +13,14 @@ const magasinSchema = new mongoose.Schema(
             trim: true
         },
         actif : {
-            type : Boolean , 
+            type : Boolean ,
             default : true
         },
         gestionnaireId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            default: null
+            default: null,
+            index: true
         }
     },
     {
