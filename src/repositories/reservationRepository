@@ -14,6 +14,11 @@ const trouverChevauchements = async (materielId, debut, fin, maintenant = new Da
         .sort({ dateDebut: 1 });
 };
 
+const creer = async (data) => {
+    return await Reservation.create(data);
+};
+
 module.exports = {
-    trouverChevauchements
+    trouverChevauchements,
+    creer
 };
