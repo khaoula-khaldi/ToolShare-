@@ -1,16 +1,26 @@
 const User = require('../models/User');
 
-async function create(data) {
-  return  await User.create(data);
-}
+const MAGASIN_FIELDS = 'name status';
 
-async function findByEmailWithPassword(email) {
-  return  await User.findOne({email}).select('+password');
-}
+const create = (data) => User.create(data);
 
-async function findUserById(id) {
-  return await User.findById(id);
-}
+const findById = (id) => User.findById(id).populate('magasin', MAGASIN_FIELDS);
 
+const findByEmail = (email, withPassword = false) => {
+    const query = User.findOne({ email });
+    return withPassword ? query.select('+password') : query;
+};
 
-module.exports = {create,findUserById,findByEmailWithPassword}
+const findAll = (filter = {}, { skip = 0, limit = 20 } = {}) =>
+    User.find(filter)
+        .populate('magasin', MAGASIN_FIELDS)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+const count = (filter = {}) => User.countDocuments(filter);
+
+const updateById = (id, data) =>
+    User.findByIdAndUpdate(id, data, { new: true, runValidators: true }).populate('magasin', MAGASIN_FIELDS);
+
+module.exports = { create, findById, findByEmail, findAll, count, updateById };
