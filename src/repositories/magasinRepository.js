@@ -1,4 +1,3 @@
-
 const Magasin = require("../models/Magasin");
 
 const creer = async (data) => {
@@ -23,7 +22,6 @@ const modifierParId = async (id, data) => {
 const supprimerParId = async (id) => {
     return await Magasin.findByIdAndDelete(id);
 };
-
 
 const disactiveMagasin = async (id) => {
   return await Magasin.findByIdAndUpdate(

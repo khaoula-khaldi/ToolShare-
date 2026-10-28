@@ -7,6 +7,8 @@ const installationRoutes = require('./routes/installation.routes')
 const materielRoutes = require("./routes/materielRoutes");
 const magasinRoutes = require("./routes/magasinRoutes");
 const authRoutes = require("./routes/auth.routes");
+const gestionnaireUser = require("./routes/gestionnaireUser.routes");
+
 const userRoutes = require("./routes/user.routes");
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
@@ -27,7 +29,9 @@ app.use('/api/installation' , installationRoutes )
 app.use("/api/materiels", materielRoutes);
 app.use("/api/magasins", magasinRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/createUser",gestionnaireUser);
 app.use("/api/users", userRoutes);
+
 
 
 const demarrerServeur = async () => {
