@@ -1,49 +1,48 @@
-const Materiel = require("../models/Materiel");
+const Reservation = require("../models/Reservation");
+
+const MATERIEL_FIELDS = "nom description etat";
+const MAGASIN_FIELDS = "nom adresse";
+
+const trouverChevauchements = async (materielId, debut, fin, maintenant = new Date()) => {
+    return await Reservation.find({
+        materielId,
+        dateDebut: { $lt: fin },
+        $or: [
+            { statut: "CONFIRMEE", dateFin: { $gt: debut } },
+            { statut: "EN_COURS", $or: [{ dateFin: { $gt: debut } }, { dateFin: { $lte: maintenant } }] }
+        ]
+    })
+        .select("dateDebut dateFin statut")
+        .sort({ dateDebut: 1 });
+};
 
 const creer = async (data) => {
-    return await Materiel.create(data);
+    return await Reservation.create(data);
 };
 
-const trouverTous = async (filtres = {}) => {
-    return await Materiel.find(filtres);
+const trouverParUtilisateur = async (filtre, { skip = 0, limit = 20 } = {}) => {
+    return await Reservation.find(filtre)
+        .populate("materielId", MATERIEL_FIELDS)
+        .populate("magasinId", MAGASIN_FIELDS)
+        .sort({ dateDebut: -1 })
+        .skip(skip)
+        .limit(limit);
 };
 
-const trouverParId = async (id) => {
-    return await Materiel.findById(id);
+const compter = async (filtre) => {
+    return await Reservation.countDocuments(filtre);
 };
 
-const modifierParId = async (id, data) => {
-    return await Materiel.findByIdAndUpdate(id, data, {
-        returnDocument: 'after',
-        runValidators: true
-    });
-};
-
-const verrouiller = async (id, dureeMs = 10000) => {
-    const maintenant = new Date();
-    const verrou = new Date(maintenant.getTime() + dureeMs);
-
-    const materiel = await Materiel.findOneAndUpdate(
-        {
-            _id: id,
-            $or: [{ verrouReservation: null }, { verrouReservation: { $lte: maintenant } }]
-        },
-        { verrouReservation: verrou },
-        { returnDocument: 'after' }
-    );
-
-    return materiel ? verrou : null;
-};
-
-const deverrouiller = async (id, verrou) => {
-    return await Materiel.updateOne({ _id: id, verrouReservation: verrou }, { verrouReservation: null });
+const trouverParIdEtUtilisateur = async (id, utilisateurId) => {
+    return await Reservation.findOne({ _id: id, utilisateurId })
+        .populate("materielId", MATERIEL_FIELDS)
+        .populate("magasinId", MAGASIN_FIELDS);
 };
 
 module.exports = {
+    trouverChevauchements,
     creer,
-    trouverTous,
-    trouverParId,
-    modifierParId,
-    verrouiller,
-    deverrouiller
+    trouverParUtilisateur,
+    compter,
+    trouverParIdEtUtilisateur
 };
