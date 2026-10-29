@@ -196,4 +196,44 @@ router.get("/mes-reservations", authorize("user"), reservationController.mesRese
  */
 router.get("/mes-reservations/:id", authorize("user"), reservationController.maReservation);
 
+/**
+ * @swagger
+ * /reservations/mes-reservations/{id}/annuler:
+ *   patch:
+ *     summary: Annuler une de mes réservations confirmées avant son début (utilisateur)
+ *     description: >
+ *       Seule une réservation CONFIRMEE dont la date de début n'est pas encore atteinte peut être annulée.
+ *       L'annulation libère le créneau. La réservation reste consultable dans l'historique.
+ *     tags: [Réservations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Réservation annulée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: 'Réservation annulée.' }
+ *                 data: { $ref: '#/components/schemas/MaReservation' }
+ *       400:
+ *         description: Id invalide
+ *       401:
+ *         description: Authentification requise
+ *       403:
+ *         description: Réservé aux utilisateurs
+ *       404:
+ *         description: Réservation introuvable (ou appartenant à un autre utilisateur)
+ *       409:
+ *         description: Réservation non confirmée (annulée, en cours, terminée) ou déjà commencée
+ */
+router.patch("/mes-reservations/:id/annuler", authorize("user"), reservationController.annuler);
+
 module.exports = router;

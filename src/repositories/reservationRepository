@@ -39,10 +39,21 @@ const trouverParIdEtUtilisateur = async (id, utilisateurId) => {
         .populate("magasinId", MAGASIN_FIELDS);
 };
 
+const annulerSiConfirmee = async (id, utilisateurId, maintenant = new Date()) => {
+    return await Reservation.findOneAndUpdate(
+        { _id: id, utilisateurId, statut: "CONFIRMEE", dateDebut: { $gt: maintenant } },
+        { statut: "ANNULEE" },
+        { returnDocument: "after", runValidators: true }
+    )
+        .populate("materielId", MATERIEL_FIELDS)
+        .populate("magasinId", MAGASIN_FIELDS);
+};
+
 module.exports = {
     trouverChevauchements,
     creer,
     trouverParUtilisateur,
     compter,
-    trouverParIdEtUtilisateur
+    trouverParIdEtUtilisateur,
+    annulerSiConfirmee
 };

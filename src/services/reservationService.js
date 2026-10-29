@@ -26,7 +26,6 @@ const prendreVerrou = async (materielId) => {
     throw new AppError("Ce matériel est très sollicité en ce moment. Réessayez.", 409);
 };
 
-
 const creerReservation = async (actor, data = {}) => {
     const { magasinId, materielId, dateDebut, duree } = data;
 
@@ -58,7 +57,6 @@ const creerReservation = async (actor, data = {}) => {
         await materielRepository.deverrouiller(materielId, verrou);
     }
 };
-
 
 const toPlain = (doc) => (doc && typeof doc.toJSON === "function" ? doc.toJSON() : doc);
 
@@ -129,8 +127,24 @@ const obtenirMaReservation = async (actor, id) => {
     return formaterReservation(reservation);
 };
 
+const annulerMaReservation = async (actor, id) => {
+    if (!mongoose.isValidObjectId(id)) throw new AppError("Id de la réservation invalide.", 400);
+
+    const maintenant = new Date();
+    const annulee = await reservationRepository.annulerSiConfirmee(id, actor.id, maintenant);
+    if (annulee) return formaterReservation(annulee, maintenant);
+
+    const reservation = await obtenirMaReservation(actor, id);
+
+    if (reservation.statut !== "CONFIRMEE") {
+        throw new AppError(`Seule une réservation confirmée peut être annulée (statut actuel : ${reservation.statut}).`, 409);
+    }
+    throw new AppError("Impossible d'annuler une réservation déjà commencée.", 409);
+};
+
 module.exports = {
     creerReservation,
     obtenirMesReservations,
-    obtenirMaReservation
+    obtenirMaReservation,
+    annulerMaReservation
 };

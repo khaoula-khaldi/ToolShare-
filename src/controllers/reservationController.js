@@ -29,8 +29,20 @@ const maReservation = asyncHandler(async (req, res) => {
     });
 });
 
+
+const annuler = asyncHandler(async (req, res) => {
+    const reservation = await reservationService.annulerMaReservation(req.user, req.params.id);
+ 
+    return res.status(200).json({
+        success: true,
+        message: "Réservation annulée.",
+        data: reservation
+    });
+});
+
 module.exports = {
     creer,
     mesReservations,
-    maReservation
+    maReservation,
+    annuler
 };
