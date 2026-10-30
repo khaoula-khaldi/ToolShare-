@@ -4,56 +4,114 @@ const magasinRepository = require("../repositories/magasinRepository");
 const reservationRepository = require("../repositories/reservationRepository");
 const AppError = require("../utils/AppError");
 
-const creerMateriel = async (data) => {
-    if (!data.nom || !data.magasinId) {
-        throw new Error("Le nom et le magasin sont obligatoires.");
-    }
+const ETATS = ["BON", "ENDOMMAGE", "EN_MAINTENANCE"];
+const DISPONIBILITES_MANUELLES = ["DISPONIBLE", "INDISPONIBLE"];
 
-    return await materielRepository.creer(data);
+const assertObjectId = (id, label = "Id du matériel") => {
+    if (!mongoose.isValidObjectId(id)) throw new AppError(`${label} invalide.`, 400);
+};
+
+const isFilled = (value) => typeof value === "string" && value.trim() !== "";
+
+const verifierEnum = (value, valeurs, champ) => {
+    if (value !== undefined && !valeurs.includes(value)) {
+        throw new AppError(`${champ} invalide. Valeurs possibles : ${valeurs.join(", ")}.`, 400);
+    }
+};
+
+const creerMateriel = async (data = {}) => {
+    if (!isFilled(data.nom) || !data.magasinId) {
+        throw new AppError("Le nom et le magasin sont obligatoires.", 400);
+    }
+    assertObjectId(data.magasinId, "Id du magasin");
+    verifierEnum(data.etat, ETATS, "État");
+
+    const magasin = await magasinRepository.trouverParId(data.magasinId);
+    if (!magasin) throw new AppError("Magasin introuvable.", 404);
+    if (!magasin.actif) throw new AppError("Impossible d'ajouter un matériel à un magasin désactivé.", 400);
+
+    return await materielRepository.creer({
+        nom: data.nom,
+        description: data.description,
+        etat: data.etat,
+        magasinId: data.magasinId
+    });
 };
 
 const obtenirTousLesMateriels = async (filtres = {}) => {
-    return await materielRepository.trouverTous(filtres);
+    const filtre = {};
+
+    if (filtres.magasinId !== undefined) {
+        assertObjectId(filtres.magasinId, "Id du magasin");
+        filtre.magasinId = filtres.magasinId;
+    }
+    if (filtres.disponibilite !== undefined) {
+        verifierEnum(filtres.disponibilite, ["DISPONIBLE", "INDISPONIBLE", "EMPRUNTE"], "Disponibilité");
+        filtre.disponibilite = filtres.disponibilite;
+    }
+    if (filtres.etat !== undefined) {
+        verifierEnum(filtres.etat, ETATS, "État");
+        filtre.etat = filtres.etat;
+    }
+    if (filtres.actif === "true" || filtres.actif === "false") {
+        filtre.actif = filtres.actif === "true";
+    }
+
+    return await materielRepository.trouverTous(filtre);
 };
 
 const obtenirMaterielParId = async (id) => {
+    assertObjectId(id);
     const materiel = await materielRepository.trouverParId(id);
 
     if (!materiel) {
-        throw new Error("Matériel introuvable.");
+        throw new AppError("Matériel introuvable.", 404);
     }
 
     return materiel;
 };
 
-const modifierMateriel = async (id, data) => {
-    const materiel = await materielRepository.modifierParId(id, data);
-
-    if (!materiel) {
-        throw new Error("Matériel introuvable.");
+const modifierMateriel = async (id, data = {}) => {
+    assertObjectId(id);
+    const champs = {};
+    if (data.nom !== undefined) {
+        if (!isFilled(data.nom)) throw new AppError("Le nom ne peut pas être vide.", 400);
+        champs.nom = data.nom;
+    }
+    if (data.description !== undefined) champs.description = data.description;
+    if (data.etat !== undefined) {
+        verifierEnum(data.etat, ETATS, "État");
+        champs.etat = data.etat;
+    }
+    if (data.disponibilite !== undefined) {
+        verifierEnum(data.disponibilite, DISPONIBILITES_MANUELLES, "Disponibilité");
+        champs.disponibilite = data.disponibilite;
     }
 
-    return materiel;
+    if (!Object.keys(champs).length) {
+        throw new AppError("Au moins un champ (nom, description, etat, disponibilite) est obligatoire.", 400);
+    }
+
+    const actuel = await obtenirMaterielParId(id);
+    if (champs.disponibilite && actuel.disponibilite === "EMPRUNTE") {
+        throw new AppError("Matériel actuellement emprunté : enregistrez d'abord son retour.", 409);
+    }
+
+    return await materielRepository.modifierParId(id, champs);
 };
 
 const desactiverMateriel = async (id) => {
-    const materiel = await materielRepository.modifierParId(id, {
-        actif: false
-    });
+    const materiel = await obtenirMaterielParId(id);
 
-    if (!materiel) {
-        throw new Error("Matériel introuvable.");
+    if (!materiel.actif) {
+        throw new AppError("Matériel déjà désactivé.", 400);
     }
 
-    return materiel;
+    return await materielRepository.modifierParId(id, { actif: false });
 };
 
 
 const HEURE_MS = 60 * 60 * 1000;
-
-const assertObjectId = (id, label) => {
-    if (!mongoose.isValidObjectId(id)) throw new AppError(`${label} invalide.`, 400);
-};
 
 const calculerCreneau = (dateDebut, duree, maintenant = new Date()) => {
     if (!dateDebut) throw new AppError("La date de début est obligatoire.", 400);
@@ -68,6 +126,8 @@ const calculerCreneau = (dateDebut, duree, maintenant = new Date()) => {
     }
 
     const fin = new Date(debut.getTime() + dureeHeures * HEURE_MS);
+    if (Number.isNaN(fin.getTime())) throw new AppError("Durée trop longue.", 400);
+
     return { debut, fin, dureeHeures };
 };
 

@@ -11,6 +11,37 @@ const creer = asyncHandler(async (req, res) => {
     });
 });
 
+const mesReservations = asyncHandler(async (req, res) => {
+    const result = await reservationService.obtenirMesReservations(req.user, req.query);
+
+    return res.status(200).json({
+        success: true,
+        ...result
+    });
+});
+
+const maReservation = asyncHandler(async (req, res) => {
+    const reservation = await reservationService.obtenirMaReservation(req.user, req.params.id);
+
+    return res.status(200).json({
+        success: true,
+        data: reservation
+    });
+});
+
+const reservationMagasin = asyncHandler(async(req,res) =>{
+    const reservations = await reservationService.obtenirReservationMagasin(req.user);
+    return res.status(200).json({
+        success:true,
+        data:reservations
+    });
+}) ;
+    
+
+
 module.exports = {
-    creer
+    creer,
+    mesReservations,
+    maReservation,
+    reservationMagasin
 };

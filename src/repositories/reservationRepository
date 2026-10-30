@@ -1,5 +1,7 @@
 const Reservation = require("../models/Reservation");
 
+const MATERIEL_FIELDS = "nom description etat";
+const MAGASIN_FIELDS = "nom adresse";
 
 const trouverChevauchements = async (materielId, debut, fin, maintenant = new Date()) => {
     return await Reservation.find({
@@ -18,7 +20,36 @@ const creer = async (data) => {
     return await Reservation.create(data);
 };
 
+const trouverParUtilisateur = async (filtre, { skip = 0, limit = 20 } = {}) => {
+    return await Reservation.find(filtre)
+        .populate("materielId", MATERIEL_FIELDS)
+        .populate("magasinId", MAGASIN_FIELDS)
+        .sort({ dateDebut: -1 })
+        .skip(skip)
+        .limit(limit);
+};
+
+const compter = async (filtre) => {
+    return await Reservation.countDocuments(filtre);
+};
+
+const trouverParIdEtUtilisateur = async (id, utilisateurId) => {
+    return await Reservation.findOne({ _id: id, utilisateurId })
+        .populate("materielId", MATERIEL_FIELDS)
+        .populate("magasinId", MAGASIN_FIELDS);
+};
+
+const trouverParMagasin = async (magasinId)=>{
+    return await Reservation.find({magasinId});
+}
+
+
+
 module.exports = {
     trouverChevauchements,
-    creer
+    creer,
+    trouverParUtilisateur,
+    compter,
+    trouverParIdEtUtilisateur,
+    trouverParMagasin
 };
