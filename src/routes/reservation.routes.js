@@ -4,7 +4,7 @@ const router = express.Router();
 const authenticate = require("../middlewares/authenticate");
 const authorize = require("../middlewares/authorize");
 const reservationController = require("../controllers/reservationController");
-
+const authorizeGestionnaire =require("../middlewares/gestionnaireAuthorization");
 router.use(authenticate);
 
 /**
@@ -195,5 +195,7 @@ router.get("/mes-reservations", authorize("user"), reservationController.mesRese
  *         description: Réservation introuvable (ou appartenant à un autre utilisateur)
  */
 router.get("/mes-reservations/:id", authorize("user"), reservationController.maReservation);
+
+router.get("/gestionnaire",authorizeGestionnaire , reservationController.reservationMagasin);
 
 module.exports = router;

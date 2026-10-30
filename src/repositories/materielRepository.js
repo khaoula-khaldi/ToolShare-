@@ -1,3 +1,4 @@
+
 const Materiel = require("../models/Materiel");
 
 const creer = async (data) => {
@@ -19,27 +20,9 @@ const modifierParId = async (id, data) => {
     });
 };
 
-const verrouiller = async (id, dureeMs = 10000) => {
-    const maintenant = new Date();
-    return await Materiel.findOneAndUpdate(
-        {
-            _id: id,
-            $or: [{ verrouReservation: null }, { verrouReservation: { $lte: maintenant } }]
-        },
-        { verrouReservation: new Date(maintenant.getTime() + dureeMs) },
-        { returnDocument: 'after' }
-    );
-};
-
-const deverrouiller = async (id) => {
-    return await Materiel.updateOne({ _id: id }, { verrouReservation: null });
-};
-
 module.exports = {
     creer,
     trouverTous,
     trouverParId,
-    modifierParId,
-    verrouiller,
-    deverrouiller
+    modifierParId
 };

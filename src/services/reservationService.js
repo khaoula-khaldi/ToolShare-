@@ -1,6 +1,7 @@
 const reservationRepository = require("../repositories/reservationRepository");
 const materielRepository = require("../repositories/materielRepository");
 const materielService = require("./materielService");
+const magasinRepository = require("../repositories/magasinRepository");
 const mongoose = require("mongoose");
 const AppError = require("../utils/AppError");
 const { STATUTS } = require("../models/Reservation");
@@ -129,8 +130,17 @@ const obtenirMaReservation = async (actor, id) => {
     return formaterReservation(reservation);
 };
 
+const obtenirReservationMagasin = async(acteur)=>{
+    const magasin = await magasinRepository.findByGestionnaire(acteur.id);
+    if(!magasin){
+        throw new AppError("Aucun magasin associé à ce gestionnaire",404);
+    }
+    return await reservationRepository.trouverParMagasin(magasin._id);
+}
+
 module.exports = {
     creerReservation,
     obtenirMesReservations,
-    obtenirMaReservation
+    obtenirMaReservation,
+    obtenirReservationMagasin
 };

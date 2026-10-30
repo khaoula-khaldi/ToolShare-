@@ -39,10 +39,17 @@ const trouverParIdEtUtilisateur = async (id, utilisateurId) => {
         .populate("magasinId", MAGASIN_FIELDS);
 };
 
+const trouverParMagasin = async (magasinId)=>{
+    return await Reservation.find({magasinId});
+}
+
+
+
 module.exports = {
     trouverChevauchements,
     creer,
     trouverParUtilisateur,
     compter,
-    trouverParIdEtUtilisateur
+    trouverParIdEtUtilisateur,
+    trouverParMagasin
 };

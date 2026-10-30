@@ -29,8 +29,19 @@ const maReservation = asyncHandler(async (req, res) => {
     });
 });
 
+const reservationMagasin = asyncHandler(async(req,res) =>{
+    const reservations = await reservationService.obtenirReservationMagasin(req.user);
+    return res.status(200).json({
+        success:true,
+        data:reservations
+    });
+}) ;
+    
+
+
 module.exports = {
     creer,
     mesReservations,
-    maReservation
+    maReservation,
+    reservationMagasin
 };

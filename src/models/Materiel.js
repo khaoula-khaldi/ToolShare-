@@ -31,12 +31,12 @@ const materielSchema = new mongoose.Schema(
             ref: "Magasin",
             required: true
         },
-      
         verrouReservation: {
             type: Date,
             default: null,
             select: false
-        }
+        }      
+
     },
     {
         timestamps: true
